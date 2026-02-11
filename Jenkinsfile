@@ -7,7 +7,7 @@ pipeline {
             steps {
                 powershell '''
                 Import-Module PSWindowsUpdate
-                Install-WindowsUpdate -AcceptAll -AutoReboot
+                Install-WindowsUpdate -AcceptAll -IgnoreReboot
                 '''
             }
         }
