@@ -16,6 +16,10 @@ pipeline {
             steps {
                 powershell '''
                 choco upgrade all -y
+                if ($LASTEXITCODE -eq 3010) {
+                    Write-Host "Reboot required, but continuing build..."
+                    exit 0
+                    }
                 '''
             }
         }
