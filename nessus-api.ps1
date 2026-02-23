@@ -10,6 +10,7 @@ $headers = @{
 }
 
 Write-Host "Launching Pre-Patch Scan..."
+
 Invoke-RestMethod -Uri "https://localhost:8834/scans/$preScanId/launch" `
     -Method Post `
     -Headers $headers `
@@ -17,14 +18,66 @@ Invoke-RestMethod -Uri "https://localhost:8834/scans/$preScanId/launch" `
 
 Write-Host "Pre-Patch Scan Triggered."
 
-# (Optional delay before post-scan)
-Start-Sleep -Seconds 10
+
+# ---------------------------------------------------
+# Launch Post-Patch Scan
+# ---------------------------------------------------
 
 Write-Host "Launching Post-Patch Scan..."
+
 Invoke-RestMethod -Uri "https://localhost:8834/scans/$postScanId/launch" `
     -Method Post `
     -Headers $headers `
     -SkipCertificateCheck
 
 Write-Host "Post-Patch Scan Triggered."
+Write-Host "Waiting for Post-Patch Scan to Complete..."
+
+
+# ---------------------------------------------------
+# Wait Until Scan Completes
+# ---------------------------------------------------
+
+$status = ""
+
+while ($status -ne "completed") {
+
+    Start-Sleep -Seconds 30
+
+    $scanDetails = Invoke-RestMethod -Uri "https://localhost:8834/scans/$postScanId" `
+        -Method Get `
+        -Headers $headers `
+        -SkipCertificateCheck
+
+    $status = $scanDetails.info.status
+
+    Write-Host "Current Scan Status: $status"
+}
+
+Write-Host "Scan Completed Successfully."
+
+
+# ---------------------------------------------------
+# Check Vulnerability Counts
+# ---------------------------------------------------
+
+$critical = $scanDetails.info.severitycount.critical
+$high = $scanDetails.info.severitycount.high
+
+Write-Host "Critical Vulnerabilities: $critical"
+Write-Host "High Vulnerabilities: $high"
+
+if ($critical -gt 0 -or $high -gt 0) {
+
+    Write-Host "Vulnerabilities still exist!"
+    exit 1   # Jenkins build FAIL
+
+}
+else {
+
+    Write-Host "System is secure. No Critical/High vulnerabilities."
+}
+
+
+
 
