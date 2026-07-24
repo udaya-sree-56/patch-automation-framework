@@ -18,7 +18,6 @@ Invoke-RestMethod -Uri "https://localhost:8834/scans/$preScanId/launch" `
 
 Write-Host "Pre-Patch Scan Triggered."
 
-
 # ---------------------------------------------------
 # Launch Post-Patch Scan
 # ---------------------------------------------------
@@ -32,7 +31,6 @@ Invoke-RestMethod -Uri "https://localhost:8834/scans/$postScanId/launch" `
 
 Write-Host "Post-Patch Scan Triggered."
 Write-Host "Waiting for Post-Patch Scan to Complete..."
-
 
 # ---------------------------------------------------
 # Wait Until Scan Completes
@@ -55,7 +53,6 @@ while ($status -ne "completed") {
 }
 
 Write-Host "Scan Completed Successfully."
-
 
 # ---------------------------------------------------
 # Check Vulnerability Counts
